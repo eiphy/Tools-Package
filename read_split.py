@@ -3,6 +3,7 @@ import keyhead
 def ReadStd(filename):
     with open(filename) as fileobject:
         temp = fileobject.readlines()
+
     if temp[0] != '[automaton]\n':
         error = 'Structure of the file is wrong'
         return -1, error
@@ -11,10 +12,12 @@ def ReadStd(filename):
     if error != 0:
         return -1, error
 
-# remove all spaces
+# remove all spaces and '\n'
     for i in range(7):
         temp[i] = temp[i].replace(' ','')
+        temp[i] = temp[i].strip('\n')
 
+# deep split the list
     temp = deep_split(temp)
 
     return temp, 1
@@ -57,18 +60,26 @@ def deep_split(list_ori):
     list_split = []
     
     # deep split the list according to ','
-    for i in range(7):
+    for i in range(8):
         if i != 4:
             list_split.append(list_ori[i].split(','))
         else:
-            list_split.append(list_ori[i].split(')'))
+            list_split.append(list_ori[i].split('),'))
 
-    # get rid of extra spaces
-    for i in list_split:
-        for j in i:
-            j = j.strip()
+        list_split[i] = list(filter(None, list_split[i]))
+
+    # get rid of extra whitespaces
+    for i in range(8):
+        for j in range(len(list_split[i])):
+            list_split[i][j] = list_split[i][j].strip()
+
+    # remove extra ',' in transition list & add ')'
+    for i in range(len(list_split[4])):
+        list_split[4][i] = list_split[4][i].strip(',')
+        if list_split[4][i][-1] != ')':
+            list_split[4][i] = list_split[4][i] + ')'
 
     return list_split
         
-
-list, error = ReadStd('EOperation.cfg')
+# For test purpose
+# list, error = ReadStd('EOperation.cfg')
