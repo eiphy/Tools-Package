@@ -1,4 +1,6 @@
 import keyhead
+
+
 # This function is used to read the cfg file and convert the content to list for later process & check the basic syntax.
 def ReadStd(filename):
     with open(filename) as fileobject:
@@ -13,14 +15,15 @@ def ReadStd(filename):
         return -1, error
 
 # remove all spaces and '\n'
-    for i in range(7):
+    for i in range(8):
         temp[i] = temp[i].replace(' ','')
+        temp[i] = temp[i].replace('-','_')
         temp[i] = temp[i].strip('\n')
 
 # deep split the list
     temp = deep_split(temp)
 
-    return temp, 1
+    return temp, 0
 
 
 # This function is used to split the automaton components into different list
@@ -76,8 +79,6 @@ def deep_split(list_ori):
     # remove extra ',' in transition list & add ')'
     for i in range(len(list_split[4])):
         list_split[4][i] = list_split[4][i].strip(',')
-        if list_split[4][i][-1] != ')':
-            list_split[4][i] = list_split[4][i] + ')'
 
     return list_split
         
