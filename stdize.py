@@ -9,21 +9,28 @@ def stdize():
 
     auto_list, error = read_split.ReadStd(filer)
 
+    error = std_write(filew, auto_list, error)
+    return error
+
+
+def std_write(filew, std_list, error):
     if error != 0:
         print(error)
         return -1
 
-    auto_list[4] = copy.deepcopy(std_transitions(auto_list[4]))
-    auto_list = std_join(auto_list)
+    std_list[4] = copy.deepcopy(std_transitions(std_list[4]))
+    std_list = std_join(std_list)
 
     with open(filew, 'w') as fileobject:
         fileobject.write('[automaton]\n')
-        if auto_list[-1] == '0\n':
+        if std_list[-1] == '0\n':
             for i in range(7):
-                fileobject.write(auto_list[i])
+                fileobject.write(std_list[i])
         else:
             for i in range(8):
-                fileobject.write(auto_list[i])
+                fileobject.write(std_list[i])
+
+    return 0
 
 
 def std_transitions(trlist):
