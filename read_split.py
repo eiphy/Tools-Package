@@ -81,6 +81,39 @@ def deep_split(list_ori):
         list_split[4][i] = list_split[4][i].strip(',')
 
     return list_split
+
+
+def trans_split(trans_list, mode=0):
+    statetr = []
+    eventtr = []
+    temp = []
+
+    for trans in trans_list:
+        temp.append(trans.strip('(').split(','))
+
+    if mode == 1:
+        return temp
+
+    for term in temp:
+        try:
+            statetr.index(term[0])
+        except:
+            statetr.append(term[0])
+
+        try:
+            statetr.index(term[1])
+        except:
+            statetr.append(term[1])
+
+        try:
+            eventtr.index(term[2])
+        except:
+            eventtr.append(term[2])
+
+    return list([statetr, eventtr])
+
+
+
         
 # For test purpose
 # list, error = ReadStd('EOperation.cfg')

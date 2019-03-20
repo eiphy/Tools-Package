@@ -13,7 +13,7 @@ def stdize():
     return error
 
 
-def std_write(filew, std_list, error):
+def std_write(filew, std_list, error=0):
     if error != 0:
         print(error)
         return -1
@@ -46,7 +46,7 @@ def std_transitions(trlist):
 
 
 def std_join(temp_list):
-    head = ['states = ', 'alphabet = ', 'controllable = ', 'observalble = ', 'transitions = ', 
+    head = ['states = ', 'alphabet = ', 'controllable = ', 'observable = ', 'transitions = ', 
         'marker-states = ', 'initial-state = ', 'kind = ']
 
     out_list = []
