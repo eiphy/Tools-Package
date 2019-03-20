@@ -58,4 +58,4 @@ def std_join(temp_list):
     return out_list
 
 
-stdize()
+# stdize()
