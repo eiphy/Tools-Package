@@ -53,7 +53,7 @@ def check_state(state_list, event_list, auto_list):
 
     for i in range(len(event_list)):
         if evento.find(event_list[i]) == -1:
-            print("Warning: the selfloop event '" + event_list[i] + "' is not in the original alphabet.\n It is added to the original alphabet")
+            print("Warning: the selfloop event '" + event_list[i] + "' is not in the original alphabet.\n It is added to the original alphabet, and you may need to manually change the observability and controbility properties")
             auto_list[1].append(event_list[i])
 
     return auto_list
