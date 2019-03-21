@@ -3,10 +3,7 @@ import copy
 
 
 # This function reads the file, standardlize it and write it out.
-def stdize():
-    filer = input('Please enter the input filename:\t')
-    filew = input('Please enter the output filename:\t')
-
+def stdize(filer, filew):
     auto_list, error = read_split.ReadStd(filer)
 
     error = std_write(filew, auto_list, error)
