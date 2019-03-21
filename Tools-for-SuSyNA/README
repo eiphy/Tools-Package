@@ -1,0 +1,4 @@
+This package is used for assisting the automaton modification with standard format defined in Tools-for-SuSyNA.
+SuSyNA is a tool package used to systhesis supervisory controller and can be download from Prof. Su Rong's homepagd: http://www.ntu.edu.sg/home/rsu/Home.htm
+
+Currently, you can only use this package to standardize your automaton, delete event automatically and add self loops. Access from the wrapper sysut.py is recommanded.
