@@ -67,7 +67,9 @@ def deep_split(list_ori):
         if i != 4:
             list_split.append(list_ori[i].split(','))
         else:
-            list_split.append(list_ori[i].split('),'))
+            temp = list_ori[i].split('),')
+            temp[-1] = temp[-1].strip(')')
+            list_split.append(temp)
 
         list_split[i] = list(filter(None, list_split[i]))
 

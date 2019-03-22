@@ -59,6 +59,7 @@ def check_state(state_list, event_list, auto_list):
     return auto_list
 
 
-add_self('du_1,de_2, de_3, df_4', 'a1,a2, a3','Test3.cfg',1,'EOperation.cfg')
+# For test purpose
+# add_self('du_1,de_2, de_3, df_4', 'a1,a2, a3','Test3.cfg',1,'EOperation.cfg')
 
         

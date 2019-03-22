@@ -2,6 +2,7 @@
 import add_self
 import del_event
 import stdize as std
+import secollect
 
 
 # For standardization
@@ -15,3 +16,7 @@ def selfloop(statec, eventc, filew, mode=0, filer='None'):
 # For delete event
 def delevent(eventc, filename):
     del_event.del_event(eventc, filename)
+
+# For collect the states and events
+def stateEcollect(filename, filew='None', mode=0):
+    secollect.secolle(filename, filew, mode)
