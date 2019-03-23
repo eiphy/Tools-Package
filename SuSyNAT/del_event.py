@@ -35,4 +35,4 @@ def del_event(eventc, filename):
 
     stdize.std_write(filename, auto_list)
 
-del_event('a1,a2, a3', 'Test3.cfg')
+# del_event('a1,a2, a3', 'Test3.cfg')

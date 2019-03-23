@@ -25,4 +25,4 @@ def secolle(filename, filew='None', mode=0):
 
         stdize.std_write(filew, auto_list)
 
-secolle('EOperation.cfg', 'Test.cfg')
+# secolle('EOperation.cfg', 'Test.cfg')
