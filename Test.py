@@ -1,1 +1,3 @@
-import Tools-for-SuSyNA.sysut as sysut.py
+import SuSyNAT.sysut as sysut
+
+sysut.stdize('EOperation.cfg', 'Test3.cfg')

@@ -1,4 +1,6 @@
 # This is the wrapper for the tool.
+import sys
+sys.path.append('.\SuSyNAT')
 import add_self
 import del_event
 import stdize as std
