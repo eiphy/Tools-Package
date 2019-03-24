@@ -15,7 +15,9 @@ def del_event(eventc, filename):
 
         i = 0
         while i < len(auto_list[4]):
-            if auto_list[4][i].find(event) != -1:
+            eventtr = auto_list[4][i].split(',')[-1]
+            eventtr = eventtr.strip()
+            if eventtr == event:
                 del auto_list[4][i]
             else:
                 i += 1
