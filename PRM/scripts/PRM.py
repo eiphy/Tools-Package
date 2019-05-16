@@ -278,6 +278,7 @@ class Roadmap():
                     M = [[node_test.x - node.x, node_test.y - node.y] for node_test in testset]
                     D = map(np.linalg.norm, M)
                     node.conne = [node_test for node_test, dis in zip(testset, D) if dis <= r]
+                    node.cost = [dis for dis in D if dis <= r]
                     
                     edset.append(node)
 
@@ -329,23 +330,25 @@ class Roadmap():
                 d3 = cross_mul(obs.x1-obs.x0, obs.y1-obs.y0, x1-obs.x0, y1-obs.y0)
                 d4 = cross_mul(obs.x1-obs.x0, obs.y1-obs.y0, x2-obs.x0, y2-obs.y0)
 
-                if d1 * d2 >= 0 and d3 * d4 >= 0:
-                    return True
+                if d1 * d2 < 0 and d3 * d4 < 0:
+                    return False
 
                 d1 = cross_mul(x2-x1, y2-y1, obs.x1-x1, obs.y1-y1)
                 d2 = cross_mul(x2-x1, y2-y1, obs.x2-x1, obs.y2-y1)
                 d3 = cross_mul(obs.x2-obs.x1, obs.y2-obs.y1, x1-obs.x1, y1-obs.y1)
                 d4 = cross_mul(obs.x2-obs.x1, obs.y2-obs.y1, x2-obs.x1, y2-obs.y1)
 
-                if d1 * d2 >= 0 and d3 * d4 >= 0:
-                    return True
+                if d1 * d2 < 0 and d3 * d4 < 0:
+                    return False
 
                 d1 = cross_mul(x2-x1, y2-y1, obs.x2-x1, obs.y2-y1)
                 d2 = cross_mul(x2-x1, y2-y1, obs.x0-x1, obs.y0-y1)
                 d3 = cross_mul(obs.x0-obs.x2, obs.y0-obs.y2, x1-obs.x2, y1-obs.y2)
                 d4 = cross_mul(obs.x0-obs.x2, obs.y0-obs.y2, x2-obs.x2, y2-obs.y2)
 
-                if d1 * d2 >= 0 and d3 * d4 >= 0:
-                    return True    
+                if d1 * d2 < 0 and d3 * d4 < 0:
+                    return False
+
+            return True
 
         return check_conflict_filter

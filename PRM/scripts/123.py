@@ -1,11 +1,7 @@
-def makefilter(a, c):
-   def myfilter(x):
-       if a < x < c:
-           return True
-   return myfilter
+def addtry(x):
+    if x - 1 > 1:
+        return True
+    if x * 1 > 0:
+        return True
 
-filter14 = makefilter(1, 8)
-
-myList = [1, 2, 3, 4, 5, 6]
-a = list(filter(filter14, myList))
-print(a)
+a = list(map(addtry, [-5,-3,-2,-1,0,1,2,3,4,5,6]))

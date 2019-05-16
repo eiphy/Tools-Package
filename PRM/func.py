@@ -27,6 +27,8 @@ start = datetime.datetime.now()
 
 # generate roadmap
 map = PRM.Roadmap(env, r, dense, 0)
+end = datetime.datetime.now()
+print('Planning time is ', (end-start), ' seconds\n')
 
 path = map.path_calc(x_start, y_start, x_goal, y_goal, 1)
 
