@@ -14,7 +14,6 @@ def cross_mul(px, py, qx, qy):
     return px*qy - py*qx
 
 
-
 class node():
     '''
     The basic class for node
@@ -116,8 +115,8 @@ class Roadmap():
         testset.extend(self.section[ysec][xsec])
         self.nearby_testset_gen(ysec, xsec, testset)
 
-        for node_test in testset:
-            self.node_connectivity_add(node_s, node_test, r, 0)
+        # for node_test in testset:
+        #     self.node_connectivity_add(node_s, node_test, r, 0)
 
         xsec = math.floor(g_x / r)
         ysec = math.floor(g_y / r)
@@ -125,8 +124,8 @@ class Roadmap():
         testset.extend(self.section[ysec][xsec])
         self.nearby_testset_gen(ysec, xsec, testset)
 
-        for node_test in testset:
-            self.node_connectivity_add(node_g, node_test, r, 0)
+        # for node_test in testset:
+        #     self.node_connectivity_add(node_g, node_test, r, 0)
 
         # Start search
         openset = [node_s]
@@ -249,14 +248,11 @@ class Roadmap():
         '''
         This function is used to plot the scattered node
         '''
-        xls = []
-        yls = []
+        xls = [node.x for node in self.nodels]
+        yls = [node.y for node in self.nodels]
 
-        for node in self.nodels:
-            xls.append(node.x)
-            yls.append(node.y)
         pl.scatter(xls, yls, 10, 'b')
-        pl.pause(0.0001)
+        pl.pause(1e-9)
 
 
     def node_connectivity_modifer(self, r):
@@ -270,21 +266,18 @@ class Roadmap():
         for i in range(len(self.section)):
             for j in range(len(self.section[0])):
                 for node in self.section[i][j]:
-                    # Generate testset
+                    # Generate exact testset
                     current_ind = self.section[i][j].index(node)
-                    testset = []
-                    testset.extend(self.section[i][j][current_ind+1:-1])
+                    testset = self.section[i][j][current_ind+1:-1]
                     self.nearby_testset_gen(i, j, testset)
 
-                    # Modify connectivity
-                    for node_test in testset:
-                        if node_test in edset:
-                            continue
+                    testset = [node_test for node_test in testset if node_test not in edset and node_test not in node.conne]
+                    conflict_filter = self.check_conflict(node)
+                    testset = list(filter(conflict_filter, testset))
 
-                        if node_test in node.conne:
-                            continue
-                        
-                        self.node_connectivity_add(node, node_test, r, self.cp_mode)
+                    M = [[node_test.x - node.x, node_test.y - node.y] for node_test in testset]
+                    D = map(np.linalg.norm, M)
+                    node.conne = [node_test for node_test, dis in zip(testset, D) if dis <= r]
                     
                     edset.append(node)
 
@@ -316,66 +309,43 @@ class Roadmap():
                 if xb == 0 and yb == 0:
                     continue
                 testset.extend(self.section[i+yb][j+xb])
-        
-        # return testset
 
 
-    def node_connectivity_add(self, node, node_test, r, cp_mode):
-        '''
-        This function is used to check if the two nodes should be conncted
-        ---------------------
-        param: node: current node obj
-        param: node_test: tested node obj
-        param: r: max connectable distance
-        param: cp_mode: =0: don't plot the connection
-        '''
-
-        if self.check_conflict(node.x, node.y, node_test.x, node_test.y):
-            return
-
-        dis = node.dis_calc(node_test.x, node_test.y)
-        if dis <= r:
-            node.conne.append(node_test)
-            node_test.conne.append(node)
-            node.cost.append(dis)
-            node_test.cost.append(dis)
-
-            if cp_mode == 1:
-                pl.plot([node.x,node_test.x], [node.y,node_test.y], 'b', linewidth = 1)
-
-
-    def check_conflict(self, x1, y1, x2, y2):
+    def check_conflict(self, node):
         '''
         This function is used to check if the connection violent the obstacles.
         Be aware if the obstacle is not triangle, the algorithm may fail to observe the violence, due to very narrow obstacle shape.
-        ---------------------
-        x1, y1: the coordinate of one endpoint
-        x2, y2: the coordinate of another endpoint
-        '''            
-        for obs in self.env.obs:
-            d1 = cross_mul(x2-x1, y2-y1, obs.x0-x1, obs.y0-y1)
-            d2 = cross_mul(x2-x1, y2-y1, obs.x1-x1, obs.y1-y1)
-            d3 = cross_mul(obs.x1-obs.x0, obs.y1-obs.y0, x1-obs.x0, y1-obs.y0)
-            d4 = cross_mul(obs.x1-obs.x0, obs.y1-obs.y0, x2-obs.x0, y2-obs.y0)
+        ''' 
+        x1 = node.x
+        y1 = node.y
 
-            if d1 * d2 < 0 and d3 * d4 < 0:
-                return True
+        def check_conflict_filter(node_test):
+            x2 = node_test.x
+            y2 = node_test.y
+        
+            for obs in self.env.obs:
+                d1 = cross_mul(x2-x1, y2-y1, obs.x0-x1, obs.y0-y1)
+                d2 = cross_mul(x2-x1, y2-y1, obs.x1-x1, obs.y1-y1)
+                d3 = cross_mul(obs.x1-obs.x0, obs.y1-obs.y0, x1-obs.x0, y1-obs.y0)
+                d4 = cross_mul(obs.x1-obs.x0, obs.y1-obs.y0, x2-obs.x0, y2-obs.y0)
 
-            d1 = cross_mul(x2-x1, y2-y1, obs.x1-x1, obs.y1-y1)
-            d2 = cross_mul(x2-x1, y2-y1, obs.x2-x1, obs.y2-y1)
-            d3 = cross_mul(obs.x2-obs.x1, obs.y2-obs.y1, x1-obs.x1, y1-obs.y1)
-            d4 = cross_mul(obs.x2-obs.x1, obs.y2-obs.y1, x2-obs.x1, y2-obs.y1)
+                if d1 * d2 >= 0 and d3 * d4 >= 0:
+                    return True
 
-            if d1 * d2 < 0 and d3 * d4 < 0:
-                return True
+                d1 = cross_mul(x2-x1, y2-y1, obs.x1-x1, obs.y1-y1)
+                d2 = cross_mul(x2-x1, y2-y1, obs.x2-x1, obs.y2-y1)
+                d3 = cross_mul(obs.x2-obs.x1, obs.y2-obs.y1, x1-obs.x1, y1-obs.y1)
+                d4 = cross_mul(obs.x2-obs.x1, obs.y2-obs.y1, x2-obs.x1, y2-obs.y1)
 
-            d1 = cross_mul(x2-x1, y2-y1, obs.x2-x1, obs.y2-y1)
-            d2 = cross_mul(x2-x1, y2-y1, obs.x0-x1, obs.y0-y1)
-            d3 = cross_mul(obs.x0-obs.x2, obs.y0-obs.y2, x1-obs.x2, y1-obs.y2)
-            d4 = cross_mul(obs.x0-obs.x2, obs.y0-obs.y2, x2-obs.x2, y2-obs.y2)
+                if d1 * d2 >= 0 and d3 * d4 >= 0:
+                    return True
 
-            if d1 * d2 < 0 and d3 * d4 < 0:
-                return True
+                d1 = cross_mul(x2-x1, y2-y1, obs.x2-x1, obs.y2-y1)
+                d2 = cross_mul(x2-x1, y2-y1, obs.x0-x1, obs.y0-y1)
+                d3 = cross_mul(obs.x0-obs.x2, obs.y0-obs.y2, x1-obs.x2, y1-obs.y2)
+                d4 = cross_mul(obs.x0-obs.x2, obs.y0-obs.y2, x2-obs.x2, y2-obs.y2)
 
-        return False       
+                if d1 * d2 >= 0 and d3 * d4 >= 0:
+                    return True    
 
+        return check_conflict_filter
