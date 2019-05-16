@@ -4,7 +4,7 @@ import sys
 from scripts import environment_2d
 from scripts import PRM
 import datetime
-sys.path.append('./scripts')
+# sys.path.append('./scripts')
 
 # sample parameters
 dense = 10

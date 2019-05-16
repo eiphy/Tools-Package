@@ -13,6 +13,8 @@ def cross_mul(px, py, qx, qy):
     '''
     return px*qy - py*qx
 
+
+
 class node():
     '''
     The basic class for node
@@ -35,11 +37,29 @@ class node():
         self.oscore = self.dis + self.costc     # Overall score: costc + dis        
         self.previous = self                    # Previous node, used to trace back the path
 
+    def add_conne(self, node_next, cost_next):
+        '''
+        This function is used to add connective node into current node object.
+        '''
+        self.conne.append(node_next)
+        self.conne.append(cost_next)
+
+    def del_conne(self, node_del):
+        '''
+        This function is used to delete nodes from the conne list. If the nodes don't exist in the list, an error message will be sent out.
+        '''
+        try:
+            index = self.conne.index(node_del)
+        except:
+            print("Given node is not in conne of current node")
+            return
+
+        del self.conne[index]
+        del self.cost[index]
+
     def dis_calc(self, x, y):
         '''
         This function is used to calculate distance from this node to a point
-        -----------------
-        x, y: the coordinate
         '''
         return math.sqrt((self.x-x)**2 + (self.y-y)**2)
 
@@ -50,17 +70,16 @@ class Roadmap():
     env: the environment object
     r: max connectable distance between two points
     dense: density of node w.r.t the map size i.e number of node/ area of map.
-    cp_mode=1: =1: plot the connection. Be aware that plotting connection is very inefficient in this version
-    tri=1: =1: the obstacles are all in the shape of triangle and in the format generate in the environment_2d class. Then a more efficient algorithm will be used.
+    cp_mode=1: =1: plot the connection. Be aware that plotting connection is very inefficient in this version.
     '''
-    def __init__(self, env, r, dense, cp_mode=1, tri=1):
+    def __init__(self, env, r, dense, cp_mode=1):
         self.env = env
         self.nodels = []
         self.cp_mode = cp_mode
-        self.tri = tri
-        self.nodelslen = 0
+        self.dense = 0
+        self.mapsize = env.size_x * env.size_y
 
-        # section initilization (based on hash search)
+        # section initilization
         nx = math.floor(env.size_x / r)
         ny = math.floor(env.size_y / r)
 
@@ -69,7 +88,7 @@ class Roadmap():
         if env.size_y % r:
             ny = ny + 1
 
-        self.section = [[[] for j in range(nx)] for i in range(ny)]
+        self.section = [[ [] for j in range(nx) ] for i in range(ny)]
 
         # nodels generate/sample map
         self.node_density_modifier(dense, r)
@@ -171,15 +190,23 @@ class Roadmap():
 
     def node_density_modifier(self, dense, r):
         '''
-        This function is used to modify the node density of PRM & and seperate the new added nodes to different sections.
+        This function together with other two functions are used to modify the node density of PRM & and seperate the new added nodes to different sections.
         ---------------------
         dense: density of node w.r.t the map size i.e number of node/ area of map. Currently, this value should be bigger than current density.
         r: max radius that can connect two node
         '''
-        a = self.env.size_x * self.env.size_y
-        # As the starting and goal point is continues added to the list
-        n0 = math.ceil(dense * a) + len(self.nodels) - self.nodelslen
+        if dense > self.dense:
+            self.node_density_increase(dense, r)
+        else:
+            self.node_density_decrease(dense, r)
 
+
+    def node_density_increase(self, dense, r):
+        '''
+        This function is used to increase the node density
+        '''
+        # As the starting and goal point is continues added to the list
+        n0 = math.ceil(dense * self.mapsize)
         n = n0 - len(self.nodels)
 
         while n > 0:
@@ -189,17 +216,33 @@ class Roadmap():
             for i in range(len(x_temp)):
                 if not self.env.check_collision(x_temp[i], y_temp[i]):
                     self.nodels.append(node(x_temp[i], y_temp[i]))
-
                     # to desireable section
                     xsec = math.floor(x_temp[i] / r)
                     ysec = math.floor(y_temp[i] / r)
                     self.section[ysec][xsec].append(self.nodels[-1])
-
             n = n0 - len(self.nodels)
 
         self.node_dense_plot()
 
-        self.nodelslen = len(self.nodels)
+
+    def node_density_decrease(self, dense, r):
+        '''
+        This function is used to decrease the onde density
+        The later joined start points and end points may be removed during the decreasing
+        '''
+        n0 = math.ceil(dense * self.mapsize)
+        n = len(self.nodels) - n0
+
+        if n == 0:
+            return
+        else:
+            index = np.random.randint(0, len(self.nodels)-1, n)
+
+        del_nodels = [node for node in self.nodels if self.nodels.index(node) in index]
+        self.nodels = [node for node in self.nodels if self.nodels.index(node) not in del_nodels]
+
+        for node in self.nodels:
+            map(node.del_conne, del_nodels)
 
 
     def node_dense_plot(self):
@@ -308,16 +351,7 @@ class Roadmap():
         ---------------------
         x1, y1: the coordinate of one endpoint
         x2, y2: the coordinate of another endpoint
-        '''
-        if self.tri == 0:
-            testxset = np.linspace(x1, x2, 100)
-            testyset = np.linspace(y1, y2, 100)
-            for testx, testy in zip(testxset, testyset):
-                if self.env.check_collision(testx, testy):
-                    return True
-            
-            return False
-            
+        '''            
         for obs in self.env.obs:
             d1 = cross_mul(x2-x1, y2-y1, obs.x0-x1, obs.y0-y1)
             d2 = cross_mul(x2-x1, y2-y1, obs.x1-x1, obs.y1-y1)
