@@ -12,7 +12,7 @@ r = 1
 
 pl.ion()
 pl.clf()
-np.random.seed()
+np.random.seed(4)
 
 # generate environment & first query
 env = environment_2d.Environment(10, 6, 5)
