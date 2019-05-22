@@ -278,8 +278,13 @@ class Roadmap():
                     if len(testset) != 0:
                         M = [[node_test.x - node.x, node_test.y - node.y] for node_test in testset]
                         D = np.linalg.norm(M,axis=1)
-                        node.conne = [node_test for node_test, dis in zip(testset, D) if dis <= r]
-                        node.cost = [dis for dis in D if dis <= r]
+                        for node_test, dis in zip(testset, D):
+                            if dis > r:
+                                continue
+                            node.conne.append(node_test)
+                            node.cost.append(dis)
+                        # node.conne = [node_test for node_test, dis in zip(testset, D) if dis <= r]
+                        # node.cost = [dis for dis in D if dis <= r]
                     
                     edset.append(node)
 
